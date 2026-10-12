@@ -1,124 +1,91 @@
-# **🌟Mushroom Classification Application**<br>
+# Mushroom Classification — Edible or Poisonous
 
-## **Welcome to the Mushroom Classification Application**<br>
-A user-friendly tool that leverages machine learning to classify mushrooms as edible or poisonous based on key features like cap shape, gill size, odor, and habitat.<br>
+**A scikit-learn random forest trained on the mushroom attributes dataset, with a Streamlit form that takes 19 mushroom features and reports "edible" or "poisonous".**
 
-## **🚀 Features**<br>
-✨ Real-Time Predictions
-<br>Quickly predicts whether a mushroom is edible or poisonous using pre-trained machine learning models.
-<br>
+![Python](https://img.shields.io/badge/Python-3776AB?style=flat&logo=python&logoColor=white) ![scikit-learn](https://img.shields.io/badge/scikit--learn-F7931E?style=flat&logo=scikit-learn&logoColor=white) ![Streamlit](https://img.shields.io/badge/Streamlit-FF4B4B?style=flat&logo=streamlit&logoColor=white) ![pandas](https://img.shields.io/badge/pandas-150458?style=flat&logo=pandas&logoColor=white) ![Jupyter](https://img.shields.io/badge/Jupyter-F37626?style=flat&logo=jupyter&logoColor=white) ![seaborn](https://img.shields.io/badge/seaborn-4C72B0?style=flat&logo=python&logoColor=white)
 
-✨ Interactive Design
-<br>Smooth transitions, user-friendly layout, and clean styling enhanced with dynamic animations.
-<br>
+## Overview
 
-✨ Custom Styling
-<br>A visually appealing design with a gradient background and modern UI elements for a premium experience.
-<br>
+This is a small classification project: explore the mushroom dataset in a notebook (`mainn.ipynb`), train a random forest, save it as `mushroom_model.pkl`, and wrap it in a web form (`app.py`).
 
-## **🛠️ Technology Stack**<br>
-Frontend: Streamlit<br>
-Machine Learning: Scikit-learn<br>
-Preprocessing: Data scaler and encoders (Pickle files)<br>
-Programming: Python
-<br>
+Please read this before using it: it is a learning project, **not a tool for deciding whether a mushroom is safe to eat**. The dataset is not included in the repo (the notebook reads `mushrooms.csv` from a local Windows path), the notebook was committed without outputs I can quote, so I report no accuracy figures. There is also a likely encoding mismatch between the notebook and the app, described under How It Works. Treat the app's output as unverified until that is fixed.
 
-## **💻 Installation Guide**<br>
-Clone the repository:<br>
+## Key Features
 
-    git clone https://github.com/your-repository/mushroom-classification.git  
-    cd mushroom-classification
-<br>
-Install dependencies: 
-<br>
+- **Notebook workflow** — loading, `info()`, null counts, `describe()`, dropping three columns (`cap-shape`, `gill-attachment`, `veil-type`), label-encoding the remaining 19 feature columns and the target, and a 70/30 train/test split with `random_state=73`.
+- **Random forest model** — `RandomForestClassifier(n_estimators=200, max_depth=6, class_weight='balanced', random_state=42)`.
+- **Evaluation code** — default accuracy, a confusion matrix and classification report at an adjusted 0.3 probability threshold, a feature-correlation heatmap, feature importances, and train versus test accuracy.
+- **Streamlit form** — 19 dropdowns inside an `st.form` with a Predict button, pink-themed custom CSS, and a green or red result message.
+- **Saved model** — the trained forest is pickled to `mushroom_model.pkl` and loaded by the app.
 
+## How It Works
 
-    pip install -r requirements.txt  
-<br>
-Run the application:<br>
+1. **Training (notebook).** The target `class` and each feature column are encoded with scikit-learn's `LabelEncoder`. The forest is fitted on the training split and pickled. Only the model is saved; the fitted encoders are not.
+2. **Serving (app).** `app.py` loads the pickle, shows the 19 selectboxes, and on submit converts each choice to an integer using a dictionary of mappings written by hand in the file (for example `'cap-surface': {'smooth': 0, 'scaly': 1, 'fibrous': 2, 'grooves': 3}`). The integers go into a one-row DataFrame, the model predicts, and the app shows "edible" if the prediction equals 1 and "poisonous" otherwise.
 
+Two things I could not confirm from the repo and that look wrong:
 
-    streamlit run app.py  
-<br>
+- **Feature encoding.** `LabelEncoder` numbers categories alphabetically by the values in the CSV, and the app's hand-typed numbers follow the readable names instead. Unless the two orderings happen to agree for every feature, the app feeds the model different numbers than it was trained on. I cannot check this without the CSV.
+- **Label direction.** If the target column uses the usual `e` (edible) and `p` (poisonous) values, `LabelEncoder` makes edible 0 and poisonous 1, while the app treats 1 as edible. That would invert the result.
 
-## **🧪 How It Works**<br>
-Input Mushroom Features: Enter features like cap-surface, odor, gill-spacing, and more.
+The old README also mentions a scaler and a `train_model.py` script; neither exists in the code, and the app does no scaling.
 
-Scaled Data: Inputs are preprocessed using a preloaded scaler for accuracy.
+## Tech Stack
 
-Prediction: A trained ML model predicts whether the mushroom is edible or poisonous.
+- **Language:** Python
+- **Modelling:** scikit-learn (`RandomForestClassifier`, `LabelEncoder`, metrics), pandas, NumPy
+- **Exploration:** matplotlib, seaborn, Jupyter
+- **App:** Streamlit
 
-Result: The classification result is displayed prominently on the screen.
-<br>
+## Getting Started
 
-## **💂️‍♀️ Project Structure**<br>
+### Prerequisites
 
-    📁 mushroom-classification/  
-    ├── app.py                  # Main application code  
-    ├── mushroom_model.pkl      # Pre-trained ML model & preprocessors  
-    ├── requirements.txt        # Python dependencies  
-    ├── README.md               # Project overview  
-<br>
+- Python 3 and `pip`
 
-## **🌈 Application Layout**<br>
+### Installation
 
-### **📊 Prediction Section**
-Input Fields: Specify mushroom features such as cap-surface, odor, gill-size, and habitat.<br>
+```bash
+git clone https://github.com/Danushika06/Mushroom-Classification.git
+cd Mushroom-Classification
+python -m venv venv
+source venv/bin/activate        # Windows: venv\Scripts\activate
+pip install -r requirements.txt
+pip install streamlit jupyter
+```
 
-Predict Button: Get an instant classification result.<br>
+`requirements.txt` pins numpy, pandas, scikit-learn, matplotlib, seaborn and joblib but does not list Streamlit, so install it separately as above. The pickle was made with scikit-learn, and `requirements.txt` pins `scikit-learn==1.3.1`; keep that version so the file loads.
 
-Responsive Design: Works across different screen sizes.<br>
-<br>
-## **✨ Workflow**<br>
-Data Preprocessing<br>
+### Running
 
-Input features are scaled using StandardScaler.
-Labels are encoded using LabelEncoder.
-<br>
+```bash
+streamlit run app.py
+```
 
-Model Training
-The Random Forest Classifier is used for training the model.
-Data is split into training and testing sets (80/20).
-<br>
+To retrain, obtain a `mushrooms.csv` of the standard mushroom attributes dataset, change `csv_path` in the first notebook cells to its location (it currently points to a folder on my old machine), and run `mainn.ipynb` top to bottom, which rewrites `mushroom_model.pkl`.
 
-Model Saving
-The trained model is saved as a .pkl file using pickle.
-<br>
+## Usage
 
-Deployment
-The web UI is built using Streamlit to take user inputs for mushroom features.
-The trained model is loaded to predict and display classification results.
-<br>
+Open the local URL Streamlit prints, choose a value for each of the 19 features (cap surface and colour, bruises, odor, gill and stalk properties, veil colour, ring number and type, spore print colour, population, habitat), and press Predict. Do not rely on the result for real foraging decisions.
 
-## **🚀 Execution**<br>
-Train the Model
+## Project Structure
 
-    python train_model.py  
-This script:<br>
+```
+Mushroom-Classification/
+├── app.py                 # Streamlit form, hand-written encodings, prediction
+├── mainn.ipynb            # data exploration, training, evaluation, model export
+├── mushroom_model.pkl     # pickled RandomForestClassifier
+├── requirements.txt
+└── README.md
+```
 
-Loads and preprocesses the data.<br>
-Trains the Random Forest model.<br>
-Saves the model as mushroom_model.pkl.
-<br>
+---
 
-Start the Streamlit Web App
+## Contact
 
-    streamlit run app.py  
-Interact with the Web App<br>
+<table>
+  <tr><td><b>GitHub:</b> <a href="https://github.com/Danushika06">Danushika06</a></td><td><b>LinkedIn:</b> <a href="https://www.linkedin.com/in/danushika-n-323b4628b/">danushika-n</a></td></tr>
+  <tr><td colspan="2" align="center"><b>Email:</b> <a href="mailto:danushikanagarajan@gmail.com">danushikanagarajan@gmail.com</a></td></tr>
+</table>
 
-Input mushroom features such as odor, cap-color, and habitat.
-Click on "Predict Mushroom Classification" to see the result.<br>
-
-## **🚧 Future Enhancements**<br>
-✅ Add real-time mushroom identification via image inputs (using Computer Vision).<br>
-✅ Incorporate visual guides for mushroom classification.<br>
-✅ Include comparison with known mushroom datasets for better insights.<br>
-
-## **📜 License**<br>
-This project is licensed under the MIT License. See the LICENSE file for more information.<br>
-
-## **🌟 Acknowledgments**<br>
-Special thanks to Streamlit and Scikit-learn for their powerful tools, and to all those who contributed to the development of this application.
-<br>
-
-## **🚀 Get started today and make mushroom identification safer and easier!**
+Built by **Danushika N**
